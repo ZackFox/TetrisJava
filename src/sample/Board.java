@@ -17,8 +17,9 @@ public class Board extends Pane {
     private static int[][] board = new int[ROWS][COLS];
     private List<Rectangle> landed = new ArrayList<Rectangle>();
     private Rectangle rect;
-    public boolean isFalling;
+    public boolean isFalling = true;
 
+    //********************************* конструктор доски
     public Board(Shape tetromino){
         for(int i = 0; i<ROWS; i++){
             for(int j = 0; j<COLS; j++){
@@ -26,71 +27,70 @@ public class Board extends Pane {
             }
         }
         this.tetromino = tetromino;
+        board[23][7] = 9;
+        board[23][8] = 9;
+        board[23][9] = 9;
     }
+
+    public int[][] getBoard (){
+        return board;
+    }
+
 
     public void update (){
         // фигура падает ?
+
         if(isFalling){
-            // проверить нижнюю позицию.
-//            if(isCanDown()){
-            //удалить фигуру
-            tetromino.setPosY(tetromino.getPosY()+1);    //опуститьфигурку
-            placedOnboard(true);    //разместить фигурку
+            if(isCanDown()) {
+                // состояние 0 - очищение, от 1 до 7 - движение , 9 - фиксация на доске.
+                setTetrominoState(0);
+                tetromino.setPosY(tetromino.getPosY() + 1);
+                setTetrominoState(1);
+            }
+            else{
+                setTetrominoState(9);
+                // здесь еще нет метода проверки на заполнения ряда
+                tetromino.restart();
+            }
 
             System.out.println();
             System.out.println(isCanDown());
         }
+
+
     }
 
-    public void draw(){
-//        clearBoard();
 
-        for (int i = 0; i < ROWS; i++) {
-            System.out.println();
-            for (int j = 0; j < COLS; j++) {
-                System.out.print(board[i][j]);
-                if (board[i][j] == 1) {
-                    rect = new Rectangle(15, 15);
-                    rect.setFill(Color.RED);
-                    rect.setTranslateY(i * (15 + 1));
-                    rect.setTranslateX(j * (15 + 1));
-                    landed.add(rect);
-                }
-            }
-        }
-        getChildren().addAll(landed);
-    }
-
-    public void placedOnboard(boolean vis){
+    public void setTetrominoState(int state){
         int dY = tetromino.getPosY();
         int dX = tetromino.getPosX();
-
-        int visible = (vis)?1:0;
 
         for (int i=0;i<tetromino.getMatrix().length;i++){
             int shiftY = tetromino.getMatrix()[i][0];
             int shiftX = tetromino.getMatrix()[i][1];
-            board[dY+shiftY][dX+shiftX] = visible;
+            board[dY+shiftY][dX+shiftX] = state;
         }
     }
+
 
     public boolean isCanDown (){
         int dY = tetromino.getPosY();
         int dX = tetromino.getPosX();
-        int max = tetromino.getMaxShiftY();
-
-        System.out.println("позиция :" + dY + " следующая :"+(dY+max+1));
+        int max = tetromino.getMaxShiftY()+1;
 
         try{
-            if(board[dY+max+1][dX] == 0){
+            if(board[dY+max][dX] == 0 ){
                 return true;
             }
         }
         catch (ArrayIndexOutOfBoundsException e){
             return false;
         }
+
+        System.out.println("позиция :" + dY + " сдвиг вниp: " + max + " следующая :"+(dY+max+1));
         return false;
     }
+
 
     public boolean isAvailable(){
         int dY = tetromino.getPosY();
@@ -113,17 +113,31 @@ public class Board extends Pane {
 
     }
 
-//    public void clearBoard(){
+    public void draw(){
+        for (int i = 0; i < ROWS; i++) {
+            System.out.println();
+            for (int j = 0; j < COLS; j++) {
+                System.out.print(board[i][j]);
+            }
+        }
+    }
+
+
+//    public void draw(){
+//
 //        for (int i = 0; i < ROWS; i++) {
+//            System.out.println();
 //            for (int j = 0; j < COLS; j++) {
-//                board[i][j] = 0;
+//                System.out.print(board[i][j]);
+//                if (board[i][j] == 1) {
+//                    rect = new Rectangle(15, 15);
+//                    rect.setFill(Color.RED);
+//                    rect.setTranslateY(i * (15 + 1));
+//                    rect.setTranslateX(j * (15 + 1));
+//                    landed.add(rect);
+//                }
 //            }
 //        }
-//        getChildren().remove(landed);
-//        landed.removeAll(landed);
+//        getChildren().addAll(landed);
 //    }
-
-    public int[][] getBoard (){
-        return board;
-    }
 }

@@ -25,7 +25,7 @@ public  class Shape extends Pane {
     }
 
     enum Figures {
-        T(new int[][]{{0,0},{-1,0},{0,1},{1,1}}),
+        T(new int[][]{{0,0},{-1,0},{0,1},{1,0}}),
         O(new int[][]{{0,0},{-1,0},{-1,1},{0,1}}),
         S(new int[][]{{0,0},{-1,1},{0,1},{1,0}}),
         Z(new int[][]{{0,0},{-1,0},{0,1},{1,1}}),
@@ -50,9 +50,22 @@ public  class Shape extends Pane {
     }
 
 
-
     public int getPosX() {
         return posX;
+    }
+
+    public void setPosY(int posY) {
+        this.posY = posY;
+    }
+
+    public void setPosX(int posX) {
+        this.posX = posX;
+    }
+
+    public void restart(){
+        posX = 8;
+        posY = 1;
+        shapeRandom();
     }
 
     public int getMaxShiftY() {
@@ -65,22 +78,6 @@ public  class Shape extends Pane {
         return max;
     }
 
-    public void setPosY(int posY) {
-        this.posY = posY;
-    }
-
-    public void setPosX(int posX) {
-        this.posX = posX;
-    }
-
-
-    public void setShape(Figures fig) {
-        for(int i =0; i<4;i++){
-            for(int j=0; j<2;j++) {
-                matrix[i][j] = fig.arr[i][j];
-            }
-        }
-    }
 
     public void shapeRandom(){
         Random ran = new Random();
@@ -88,5 +85,13 @@ public  class Shape extends Pane {
         Figures[] pieces = Figures.values();
         setShape(pieces[x]);
         System.out.println(pieces[x]);
+    }
+
+    public void setShape(Figures fig) {
+        for(int i =0; i<4;i++){
+            for(int j=0; j<2;j++) {
+                matrix[i][j] = fig.arr[i][j];
+            }
+        }
     }
 }

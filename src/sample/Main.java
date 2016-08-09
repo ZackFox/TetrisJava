@@ -37,9 +37,6 @@ public class Main extends Application {
         boardPane.setPrefHeight(384);
         boardPane.setStyle("-fx-background-color: black ;");
 
-        board.draw();
-        System.out.println();
-
         boardPane.getChildren().add(board);
         gameFrame.getChildren().add(boardPane);
         root.getChildren().addAll(gameFrame);
@@ -48,7 +45,14 @@ public class Main extends Application {
         Scene scene = new Scene(root, 600, 420);
         window.setScene(scene);
 
-        // управление
+        //****************************************************
+
+        board.setTetrominoState(1);  // появление фигурки на старте
+        board.draw();                // отрисовка доски
+        System.out.println();
+
+        //********************************* управление ****************
+
         scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
@@ -75,8 +79,6 @@ public class Main extends Application {
                 if(time>=0.5){
                     time=0;
 
-                    // логика
-                    board.clearBoard();
                     board.update();
 
                     //перерисовка//
