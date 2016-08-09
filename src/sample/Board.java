@@ -51,13 +51,12 @@ public class Board extends Pane {
                 setTetrominoState(9);
                 // здесь еще нет метода проверки на заполнения ряда
                 tetromino.restart();
+                setTetrominoState(1);
             }
 
             System.out.println();
             System.out.println(isCanDown());
         }
-
-
     }
 
 

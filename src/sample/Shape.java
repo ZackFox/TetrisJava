@@ -49,7 +49,6 @@ public  class Shape extends Pane {
         return posY;
     }
 
-
     public int getPosX() {
         return posX;
     }
@@ -74,10 +73,12 @@ public  class Shape extends Pane {
             if(matrix[i][0]<matrix[i+1][0]){
                 max = matrix[i+1][0];
             }
+//            if(matrix[i][0]<matrix[i+1][0]){
+//                max = matrix[i+1][0];
+//            }
         }
         return max;
     }
-
 
     public void shapeRandom(){
         Random ran = new Random();
