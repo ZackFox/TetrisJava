@@ -18,7 +18,6 @@ public class Board extends Pane {
     private static int[][] board = new int[ROWS][COLS];
     private List<Rectangle> landed = new ArrayList<Rectangle>();
     private Rectangle rect;
-    public boolean isFalling = true;
 
     //********************************* конструктор доски
     public Board(Shape tetromino){
@@ -39,17 +38,33 @@ public class Board extends Pane {
 
 
     public void update (){
-        if(isFalling){
-            if(isCanDown()) {
-                setTetrominoState(0);
-                tetromino.setPosY(tetromino.getPosY() + 1);
+        //если может падать
+        if(isCanDown()) {
+            setTetrominoState(0);
+            tetromino.setPosY(tetromino.getPosY() + 1);
+            setTetrominoState(1);
+        }
+
+        else{
+            // иначе сделать частью доски
+            setTetrominoState(9);
+            //проверить заполнение и вернутся в начало
+            checkAndClear();
+            tetromino.restart();
+
+            //если доска свободна появится
+            if(isAvailable()){
                 setTetrominoState(1);
             }
-            else{
-                setTetrominoState(9);
-                checkAndClear();
+            else {
+                //иначе очистить доску
+                for(int i = 0; i<ROWS; i++){
+                    for(int j = 0; j<COLS; j++){
+                        board[i][j] = 0;
+                    }
+                }
                 tetromino.restart();
-                setTetrominoState(1);//
+                setTetrominoState(1);
             }
         }
     }

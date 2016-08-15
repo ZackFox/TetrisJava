@@ -88,12 +88,10 @@ public class Main extends Application {
                         break;
 
                     case SPACE:
-                        if(board.isCanSlide(event)){
-                            board.setTetrominoState(0);
-                            piece.rotate();
-                            board.setTetrominoState(1);
-                            render();
-                        }
+                        board.setTetrominoState(0);
+                        piece.rotate();
+                        board.setTetrominoState(1);
+                        render();
                         break;
                 }
             }
