@@ -3,8 +3,12 @@ package sample;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.scene.Scene;
+import javafx.scene.control.MenuBar;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -22,7 +26,10 @@ public class Main extends Application {
     private List<Rectangle> landed = new ArrayList<Rectangle>();
     private Rectangle rect;
     private double time;
-    int x = 3;
+    double speed = 0.03;
+
+    HBox menu = new HBox();
+    MenuBar menuBar = new MenuBar();
 
     @Override
     public void start(Stage window) throws Exception{
@@ -38,19 +45,17 @@ public class Main extends Application {
         boardPane.setPrefHeight(384);
         boardPane.setStyle("-fx-background-color: black ;");
 
+        board.setTetrominoState(1);
+
+        menu.getChildren().add(menuBar);
+
         boardPane.getChildren().add(board);
         gameFrame.getChildren().add(boardPane);
-        root.getChildren().addAll(gameFrame);
+        root.getChildren().addAll(gameFrame,menu );
 
         window.setTitle("Hello Tetris");
         Scene scene = new Scene(root, 600, 420);
         window.setScene(scene);
-
-        //****************************************************
-
-        board.setTetrominoState(1);  // появление фигурки на старте
-        board.draw();                // отрисовка доски
-        System.out.println();
 
         //********************************* управление ****************
 
@@ -59,28 +64,48 @@ public class Main extends Application {
             public void handle(KeyEvent event) {
                 switch (event.getCode()){
                     case LEFT:
-                        if(piece.getPosX()>=0 ||piece.getPosX()<= 17) {
-                            // состояние 0 - очищение, от 1 до 7 - движение , 9 - фиксация на доске.
+                        if(board.isCanSlide(event)) {
                             board.setTetrominoState(0);
                             piece.setPosX(piece.getPosX()-1);
-                            piece.setPosY(piece.getPosY());
                             board.setTetrominoState(1);
                         }
+                        speed = 0.02;
+                        render();
                         break;
 
                     case RIGHT:
-                        if(piece.getPosX()>=0 ||piece.getPosX()<= 17) {
-                            // состояние 0 - очищение, от 1 до 7 - движение , 9 - фиксация на доске.
+                        if(board.isCanSlide(event)) {
                             board.setTetrominoState(0);
                             piece.setPosX(piece.getPosX()+1);
-                            piece.setPosY(piece.getPosY());
                             board.setTetrominoState(1);
                         }
+                        speed = 0.02;
+                        render();
+                        break;
+
+                    case DOWN:
+                        speed = 0.2;
                         break;
 
                     case SPACE:
+                        if(board.isCanSlide(event)){
+                            board.setTetrominoState(0);
+                            piece.rotate();
+                            board.setTetrominoState(1);
+                            render();
+                        }
                         break;
                 }
+            }
+        });
+
+        scene.setOnKeyReleased(new EventHandler<KeyEvent>(){
+            @Override
+            public void handle(KeyEvent event) {
+                if(event.getCode()== KeyCode.DOWN || event.getCode()== KeyCode.LEFT||event.getCode()== KeyCode.RIGHT){
+                    speed = 0.03;
+                }
+
             }
         });
 
@@ -89,16 +114,11 @@ public class Main extends Application {
         AnimationTimer animation = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                time += 0.017;
-
+                time += speed;
                 if(time>=0.5){
-                    time=0;
-
                     board.update();
-
-                    //перерисовка//
-                    board.draw();
                     render();
+                    time = 0;
                 }
             }
         };
@@ -115,7 +135,7 @@ public class Main extends Application {
                     rect = new Rectangle(15, 15);
                     rect.setFill(Color.RED);
                     rect.setTranslateY(i * (15 + 1));
-                    rect.setTranslateX(j * (15 + 1));
+                    rect.setTranslateX(j  * (15 + 1));
                     landed.add(rect);
                 }
                 else if (board.getBoard()[i][j] == 9) {

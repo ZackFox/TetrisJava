@@ -6,6 +6,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,27 +39,20 @@ public class Board extends Pane {
 
 
     public void update (){
-        // фигура падает ?
-
         if(isFalling){
             if(isCanDown()) {
-                // состояние 0 - очищение, от 1 до 7 - движение , 9 - фиксация на доске.
                 setTetrominoState(0);
                 tetromino.setPosY(tetromino.getPosY() + 1);
                 setTetrominoState(1);
             }
             else{
                 setTetrominoState(9);
-                // здесь еще нет метода проверки на заполнения ряда
+                checkAndClear();
                 tetromino.restart();
-                setTetrominoState(1);
+                setTetrominoState(1);//
             }
-
-            System.out.println();
-            System.out.println(isCanDown());
         }
     }
-
 
     public void setTetrominoState(int state){
         int dY = tetromino.getPosY();
@@ -71,26 +65,6 @@ public class Board extends Pane {
         }
     }
 
-
-    public boolean isCanDown (){
-        int dY = tetromino.getPosY();
-        int dX = tetromino.getPosX();
-        int max = tetromino.getMaxShiftY()+1;
-
-        try{
-            if(board[dY+max][dX] == 0 ){
-                return true;
-            }
-        }
-        catch (ArrayIndexOutOfBoundsException e){
-            return false;
-        }
-
-        System.out.println("позиция :" + dY + " сдвиг вниp: " + max + " следующая :"+(dY+max+1));
-        return false;
-    }
-
-
     public boolean isAvailable(){
         int dY = tetromino.getPosY();
         int dX = tetromino.getPosX();
@@ -99,7 +73,7 @@ public class Board extends Pane {
             int shiftX = tetromino.getMatrix()[i][1];
 
             try {
-                if(board[dY+shiftY][dX+shiftX] != 1)
+                if(board[dY+shiftY][dX+shiftX] != 9)
                     return true;
                 else
                     return false;
@@ -112,31 +86,73 @@ public class Board extends Pane {
 
     }
 
-    public void draw(){
-        for (int i = 0; i < ROWS; i++) {
-            System.out.println();
+    public boolean isCanDown(){
+        int dY = tetromino.getPosY();
+        int dX = tetromino.getPosX();
+
+        for (int i=0;i<tetromino.getMatrix().length;i++){
+            int shiftY = tetromino.getMatrix()[i][0];
+            int shiftX = tetromino.getMatrix()[i][1];
+            try {
+                if (board[dY + shiftY+1][dX + shiftX] != 9) {
+                    continue;
+                }
+                else
+                    return false;
+
+            } catch (ArrayIndexOutOfBoundsException e) {
+                return false;
+            }
+        }
+        return true;
+
+    }
+
+    public boolean isCanSlide (KeyEvent keycode){
+        int dY = tetromino.getPosY();
+        int dX = tetromino.getPosX();
+        int x=0;
+
+        if(keycode.getCode() == KeyCode.LEFT) x = -1;
+        else if(keycode.getCode() == KeyCode.RIGHT) x = 1;
+
+        for (int i=0;i<tetromino.getMatrix().length;i++){
+            int shiftY = tetromino.getMatrix()[i][0];
+            int shiftX = tetromino.getMatrix()[i][1];
+            try {
+                if (board[dY + shiftY][dX + shiftX+x] != 9) {
+                    continue;
+                }
+                else
+                    return false;
+
+            } catch (ArrayIndexOutOfBoundsException e) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void checkAndClear() {
+
+        int dY = tetromino.getPosY();
+        int count = 0;
+
+        for (int i=0;i<tetromino.getMatrix().length;i++) {
+            count = 0;
+            int shiftY = tetromino.getMatrix()[i][0];
             for (int j = 0; j < COLS; j++) {
-                System.out.print(board[i][j]);
+                if (board[dY + shiftY][j] == 9)
+                    count++;
+            }
+
+            System.out.println("в ряду " + (dY + shiftY) + " заполненно " + count);
+            if (count == COLS) {
+                for (int j = 0; j < COLS; j++)
+                    board[dY + shiftY][j] = 0;
+
+                System.out.println("удалить ряд " + (dY + shiftY));
             }
         }
     }
-
-
-//    public void draw(){
-//
-//        for (int i = 0; i < ROWS; i++) {
-//            System.out.println();
-//            for (int j = 0; j < COLS; j++) {
-//                System.out.print(board[i][j]);
-//                if (board[i][j] == 1) {
-//                    rect = new Rectangle(15, 15);
-//                    rect.setFill(Color.RED);
-//                    rect.setTranslateY(i * (15 + 1));
-//                    rect.setTranslateX(j * (15 + 1));
-//                    landed.add(rect);
-//                }
-//            }
-//        }
-//        getChildren().addAll(landed);
-//    }
 }
