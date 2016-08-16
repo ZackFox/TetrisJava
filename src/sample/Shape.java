@@ -1,13 +1,6 @@
 package sample;
 
-import javafx.geometry.Point3D;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 public  class Shape extends Pane {

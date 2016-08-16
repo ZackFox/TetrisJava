@@ -3,12 +3,7 @@ package sample;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 
-import java.security.Key;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Board extends Pane {
     private static final int ROWS = 24;
@@ -16,8 +11,6 @@ public class Board extends Pane {
 
     Shape tetromino;
     private static int[][] board = new int[ROWS][COLS];
-    private List<Rectangle> landed = new ArrayList<Rectangle>();
-    private Rectangle rect;
 
     //********************************* конструктор доски
     public Board(Shape tetromino){
@@ -27,9 +20,8 @@ public class Board extends Pane {
             }
         }
         this.tetromino = tetromino;
-        board[23][7] = 9;
-        board[23][8] = 9;
-        board[23][9] = 9;
+        board[0][0]= 9;
+        board[1][0]= 9;
     }
 
     public int[][] getBoard (){
@@ -64,6 +56,7 @@ public class Board extends Pane {
                     }
                 }
                 tetromino.restart();
+                tetromino.shapeRandom();
                 setTetrominoState(1);
             }
         }
@@ -80,12 +73,13 @@ public class Board extends Pane {
         }
     }
 
+    //проверка позиции
     public boolean isAvailable(){
         int dY = tetromino.getPosY();
         int dX = tetromino.getPosX();
         for (int i=0;i<tetromino.getMatrix().length;i++){
             int shiftY = tetromino.getMatrix()[i][0];
-            int shiftX = tetromino.getMatrix()[i][1];
+            int     shiftX = tetromino.getMatrix()[i][1];
 
             try {
                 if(board[dY+shiftY][dX+shiftX] != 9)
@@ -101,6 +95,7 @@ public class Board extends Pane {
 
     }
 
+    //проверка нижних клеток
     public boolean isCanDown(){
         int dY = tetromino.getPosY();
         int dX = tetromino.getPosX();
@@ -123,6 +118,7 @@ public class Board extends Pane {
 
     }
 
+    // проверка бокоых клеток
     public boolean isCanSlide (KeyEvent keycode){
         int dY = tetromino.getPosY();
         int dX = tetromino.getPosX();
@@ -149,24 +145,23 @@ public class Board extends Pane {
     }
 
     public void checkAndClear() {
-
-        int dY = tetromino.getPosY();
         int count = 0;
-
-        for (int i=0;i<tetromino.getMatrix().length;i++) {
+        for (int i=0;i<ROWS;i++) {
             count = 0;
-            int shiftY = tetromino.getMatrix()[i][0];
             for (int j = 0; j < COLS; j++) {
-                if (board[dY + shiftY][j] == 9)
-                    count++;
+                //считаем кубики в строкее
+                if (board[i][j] == 9) count++;
             }
 
-            System.out.println("в ряду " + (dY + shiftY) + " заполненно " + count);
+            //если в строке заполнены все 18 кубиков
             if (count == COLS) {
-                for (int j = 0; j < COLS; j++)
-                    board[dY + shiftY][j] = 0;
-
-                System.out.println("удалить ряд " + (dY + shiftY));
+                // сдивигаем верхние вниз
+                for(int ii = i; ii >0; ii--){
+                    for(int j = 0; j<COLS; j++) {
+                        board[ii][j] = board[ii-1][j] ;
+                        board[0][j] = 0;
+                    }
+                }
             }
         }
     }
