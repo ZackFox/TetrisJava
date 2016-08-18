@@ -2,26 +2,26 @@ package sample;
 
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.Pane;
 
 
-public class Board extends Pane {
-    private static final int ROWS = 24;
-    private static final int COLS = 18;
+public class Board {
+    private int rows ;
+    private int cols ;
 
     Shape tetromino;
-    private static int[][] board = new int[ROWS][COLS];
+    private static int[][] board ;
 
     //********************************* конструктор доски
-    public Board(Shape tetromino){
-        for(int i = 0; i<ROWS; i++){
-            for(int j = 0; j<COLS; j++){
+    public Board(int r, int c,Shape tetromino){
+        rows = r; cols = c;
+        board = new int[rows][cols];
+
+        for(int i = 0; i<rows; i++){
+            for(int j = 0; j<cols; j++){
                 board[i][j] = 0;
             }
         }
         this.tetromino = tetromino;
-        board[0][0]= 9;
-        board[1][0]= 9;
     }
 
     public int[][] getBoard (){
@@ -31,35 +31,35 @@ public class Board extends Pane {
 
     public void update (){
         //если может падать
-        if(isCanDown()) {
-            setTetrominoState(0);
-            tetromino.setPosY(tetromino.getPosY() + 1);
-            setTetrominoState(1);
-        }
-
-        else{
-            // иначе сделать частью доски
-            setTetrominoState(9);
-            //проверить заполнение и вернутся в начало
-            checkAndClear();
-            tetromino.restart();
-
-            //если доска свободна появится
-            if(isAvailable()){
+            if(isCanDown()) {
+                setTetrominoState(0);
+                tetromino.setPosY(tetromino.getPosY() + 1);
                 setTetrominoState(1);
             }
-            else {
-                //иначе очистить доску
-                for(int i = 0; i<ROWS; i++){
-                    for(int j = 0; j<COLS; j++){
-                        board[i][j] = 0;
-                    }
-                }
+
+            else{
+                // иначе сделать частью доски
+                setTetrominoState(9);
+                //проверить заполнение и вернутся в начало
+                checkAndClear();
                 tetromino.restart();
-                tetromino.shapeRandom();
-                setTetrominoState(1);
+
+                //если доска свободна появится
+                if(isAvailable()){
+                    setTetrominoState(1);
+                }
+                else {
+                    //иначе очистить доску
+                    for(int i = 0; i<rows; i++){
+                        for(int j = 0; j<cols; j++){
+                            board[i][j] = 0;
+                        }
+                    }
+                    tetromino.restart();
+                    setTetrominoState(1);
+                }
             }
-        }
+
     }
 
     public void setTetrominoState(int state){
@@ -79,7 +79,7 @@ public class Board extends Pane {
         int dX = tetromino.getPosX();
         for (int i=0;i<tetromino.getMatrix().length;i++){
             int shiftY = tetromino.getMatrix()[i][0];
-            int     shiftX = tetromino.getMatrix()[i][1];
+            int shiftX = tetromino.getMatrix()[i][1];
 
             try {
                 if(board[dY+shiftY][dX+shiftX] != 9)
@@ -146,23 +146,27 @@ public class Board extends Pane {
 
     public void checkAndClear() {
         int count = 0;
-        for (int i=0;i<ROWS;i++) {
+        for (int i=0;i<rows;i++) {
             count = 0;
-            for (int j = 0; j < COLS; j++) {
+            for (int j = 0; j < cols; j++) {
                 //считаем кубики в строкее
                 if (board[i][j] == 9) count++;
             }
 
             //если в строке заполнены все 18 кубиков
-            if (count == COLS) {
+            if (count == cols) {
                 // сдивигаем верхние вниз
                 for(int ii = i; ii >0; ii--){
-                    for(int j = 0; j<COLS; j++) {
+                    for(int j = 0; j<cols; j++) {
                         board[ii][j] = board[ii-1][j] ;
-                        board[0][j] = 0;
                     }
+                }
+
+                for(int j = 0; j<cols; j++) {
+                    board[0][j] = 0;
                 }
             }
         }
+
     }
 }

@@ -3,7 +3,7 @@ package sample;
 import javafx.scene.layout.Pane;
 import java.util.Random;
 
-public  class Shape extends Pane {
+public  class Shape {
 
     enum Figures {
         T(new int[][]{{0,0},{-1,0},{0,1},{1,0}}),
@@ -25,18 +25,32 @@ public  class Shape extends Pane {
     //*********************************
 
     private int [][] matrix;
+    private Figures curShape;
+    private Figures nextShape;
     private int posX;
     private int posY;
+    private int toggle = 0;
 
     public Shape(){
-        matrix = new int[4][2];
-        shapeRandom();
-        posX = 8;
+        posX = 2;
         posY = 1;
+        matrix = new int[4][2];
+        setShape(shapeRandom());
+        nextShape = shapeRandom();
+        rotateRandom();
+        System.out.println("Следующий " + nextShape);
     }
 
     public int[][] getMatrix() {
         return matrix;
+    }
+
+    public Figures getCurShape() {
+        return curShape;
+    }
+
+    public Figures getNextShape() {
+        return nextShape;
     }
 
     public int getPosY() {
@@ -56,9 +70,12 @@ public  class Shape extends Pane {
     }
 
     public void restart(){
-        posX = 8;
+        posX = 2;
         posY = 1;
-        shapeRandom();
+        setShape(nextShape);
+        nextShape = shapeRandom();
+        System.out.println("Следующий " + nextShape);
+        rotateRandom();
     }
 
     public void setShape(Figures fig) {
@@ -67,22 +84,37 @@ public  class Shape extends Pane {
                 matrix[i][j] = fig.arr[i][j];
             }
         }
+        curShape = fig;
     }
 
     public void rotate () {
-        for(int i =0; i<4;i++){
-            int temp = matrix[i][0];
-            matrix[i][0] = matrix[i][1];
-            matrix[i][1] = -temp;
+        if(getCurShape()== Shape.Figures.O){
+            return;
+        }
+
+        if(curShape == Shape.Figures.LINE || curShape== Shape.Figures.S || curShape== Shape.Figures.Z)
+        toggle ^= 1;
+
+        for(int i=0; i<4;i++){
+            int temp = getMatrix()[i][toggle];
+            getMatrix()[i][toggle] = getMatrix()[i][1-toggle];
+            getMatrix()[i][1-toggle] = -temp;
         }
     }
 
-    public void shapeRandom(){
+    public Figures shapeRandom(){
         Random ran = new Random();
         int x = Math.abs(ran.nextInt())%7;
         Figures[] pieces = Figures.values();
-        setShape(pieces[x]);
-        System.out.println(pieces[x]);
+        return pieces[x];
+    }
+
+    public void rotateRandom(){
+        Random ran = new Random();
+        int x = Math.abs(ran.nextInt())%4+1;
+        for(int i=0; i<x;i++){
+            rotate();
+        }
     }
 
 }
