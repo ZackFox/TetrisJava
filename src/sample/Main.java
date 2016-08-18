@@ -20,6 +20,7 @@ public class Main extends Application {
 
     private Board board;
     private Shape piece;
+    private Controller game;
     private Shape pieceView;
     private Board nextField;
     private Pane root;
@@ -43,8 +44,10 @@ public class Main extends Application {
         nextView = new Pane();
 
         piece = new Shape();
-        board = new Board(24,18,piece);
-        board.setTetrominoState(1);
+        board = new Board(24,18);
+        game = new Controller(board,piece);
+
+        nextField = new Board(5,5);
 
         boardPane.setPrefWidth(289);
         boardPane.setPrefHeight(384);
@@ -76,20 +79,20 @@ public class Main extends Application {
             public void handle(KeyEvent event) {
                 switch (event.getCode()){
                     case LEFT:
-                        if(board.isCanSlide(event) && !isPaused) {
-                            board.setTetrominoState(0);
+                        if(game.isCanSlide(event) && !isPaused) {
+                            game.setTetrominoState(0);
                             piece.setPosX(piece.getPosX()-1);
-                            board.setTetrominoState(1);
+                            game.setTetrominoState(1);
                         }
                         speed = 0.02;
                         render();
                         break;
 
                     case RIGHT:
-                        if(board.isCanSlide(event)&& !isPaused) {
-                            board.setTetrominoState(0);
+                        if(game.isCanSlide(event)&& !isPaused) {
+                            game.setTetrominoState(0);
                             piece.setPosX(piece.getPosX()+1);
-                            board.setTetrominoState(1);
+                            game.setTetrominoState(1);
                         }
                         speed = 0.02;
                         render();
@@ -105,9 +108,9 @@ public class Main extends Application {
 
                     case SPACE:
                         if(!isPaused) {
-                            board.setTetrominoState(0);
+                            game.setTetrominoState(0);
                             piece.rotate();
-                            board.setTetrominoState(1);
+                            game.setTetrominoState(1);
                         }
                         render();
                         break;
@@ -132,7 +135,7 @@ public class Main extends Application {
             public void handle(long now) {
                 time += speed;
                 if(time>=0.5 && !isPaused){
-                    board.update();
+                    game.update();
                     render();
                     time = 0;
                 }
