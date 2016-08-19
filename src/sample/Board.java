@@ -3,7 +3,7 @@ package sample;
 public class Board {
     private int rows ;
     private int cols ;
-    private static int[][] board ;
+    private int[][] board ;
 
     public Board(int r, int c){
         rows = r; cols = c;
